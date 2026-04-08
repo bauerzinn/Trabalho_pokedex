@@ -1,10 +1,35 @@
+// =============================================================================
+// PROVA PRÁTICA — POKÉDEX (Dart): mapa das questões neste arquivo
+// Q1  Pokemon + construtor + exibirFicha
+// Q2  Campos privados (_nivel, _hp*, _energia) + subirNivel / receberDano / curar
+// Q3  proximaEvolucao, nivelEvolucao, evoluir()
+// Q4  Pokedex: adicionar, remover, buscar, listarTodos
+// Q5  Filtros na Pokedex (listarCapturados, por tipo, nível, podem evoluir)
+// Q6  PokemonFogo / PokemonAgua / PokemonEletrico + calcularAtaqueBase / exibirFicha
+// Q7  Habilidade abstrata + 3 habilidades + gastarEnergia nas habilidades
+// Q8  executarTurnoBatalha — chama habilidade.usar() sem if/switch por tipo de habilidade
+// Q9  RegistravelNaPokedex em Pokemon (visto, capturado, favorito)
+// Q10 main: where/sort com funções anônimas
+// Q11 totalPokemons, quantidadePorTipo, mediaDeNivel, percentualCapturados
+// Q12 main: fluxo completo (8+ pokémons, batalhas, evolução, estatísticas)
+// =============================================================================
+
+/// Q9 — Interface: o que a Pokédex precisa registrar sobre um Pokémon.
 abstract class RegistravelNaPokedex {
+  /// Marca o Pokémon como já visto na Pokédex.
   void marcarComoVisto();
+
+  /// Marca como capturado e, pela regra da prova, também como visto.
   void marcarComoCapturado();
+
+  /// Só permite favoritar se já estiver capturado.
   void favoritar();
+
+  /// Remove o Pokémon da lista de favoritos.
   void desfavoritar();
 }
 
+/// Q1 — Classe principal do Pokémon. Q2 encapsula status; Q3 evolução; Q7 energia; Q9 interface.
 class Pokemon implements RegistravelNaPokedex {
   final int numero;
   String nome;
@@ -19,6 +44,7 @@ class Pokemon implements RegistravelNaPokedex {
   String? proximaEvolucao;
   int nivelEvolucao;
 
+  /// Q1 — Construtor com todos os dados obrigatórios; valida regras (nível 1–100, HP, etc.).
   Pokemon({
     required this.numero,
     required this.nome,
@@ -45,6 +71,7 @@ class Pokemon implements RegistravelNaPokedex {
   int get hpMaximo => _hpMaximo;
   int get energia => _energia;
 
+  /// Garante nível, HP máximo/atual, energia e regras de favorito/evolução ao criar o objeto.
   void _validarEstadoInicial() {
     if (_nivel < 1 || _nivel > 100) {
       throw ArgumentError('Nivel deve estar entre 1 e 100.');
@@ -68,17 +95,20 @@ class Pokemon implements RegistravelNaPokedex {
     }
   }
 
+  /// Q9 — Define visto = true.
   @override
   void marcarComoVisto() {
     visto = true;
   }
 
+  /// Q9 — Capturado e automaticamente visto.
   @override
   void marcarComoCapturado() {
     capturado = true;
     visto = true;
   }
 
+  /// Q9 — Só favorita se capturado; senão avisa no console.
   @override
   void favoritar() {
     if (!capturado) {
@@ -88,11 +118,13 @@ class Pokemon implements RegistravelNaPokedex {
     favorito = true;
   }
 
+  /// Q9 — Remove dos favoritos.
   @override
   void desfavoritar() {
     favorito = false;
   }
 
+  /// Q2 — Soma nível (rejeita quantidade negativa); mantém entre 1 e 100.
   void subirNivel(int quantidade) {
     if (quantidade < 0) {
       print('Valor invalido: nao e permitido subir nivel com valor negativo.');
@@ -107,6 +139,7 @@ class Pokemon implements RegistravelNaPokedex {
     }
   }
 
+  /// Q2 — Reduz HP (rejeita dano negativo); HP não fica abaixo de 0.
   void receberDano(int dano) {
     if (dano < 0) {
       print('Valor invalido: dano negativo nao e aceito.');
@@ -118,6 +151,7 @@ class Pokemon implements RegistravelNaPokedex {
     }
   }
 
+  /// Q2 — Aumenta HP até no máximo hpMaximo (rejeita cura negativa).
   void curar(int valor) {
     if (valor < 0) {
       print('Valor invalido: cura negativa nao e aceita.');
@@ -129,6 +163,7 @@ class Pokemon implements RegistravelNaPokedex {
     }
   }
 
+  /// Auxiliar Q7 — Recupera energia para batalhas (não é exigência explícita da prova).
   void restaurarEnergia(int valor) {
     if (valor < 0) {
       print('Valor invalido: energia negativa nao e aceita.');
@@ -137,6 +172,7 @@ class Pokemon implements RegistravelNaPokedex {
     _energia += valor;
   }
 
+  /// Q7 — Debita energia se houver saldo; retorna false se custo inválido ou energia insuficiente.
   bool gastarEnergia(int custo) {
     if (custo < 0) {
       print('Custo de energia invalido.');
@@ -150,6 +186,7 @@ class Pokemon implements RegistravelNaPokedex {
     return true;
   }
 
+  /// Q3 — Troca nome pela próxima evolução, zera próxima evolução, +20 HP máx. e HP cheio.
   void evoluir() {
     if (proximaEvolucao == null) {
       print('$nome nao possui proxima evolucao cadastrada.');
@@ -168,8 +205,10 @@ class Pokemon implements RegistravelNaPokedex {
     print('Evolucao concluida! Agora o pokemon e $nome.');
   }
 
+  /// Q6 — Ataque base padrão da classe base (subclasses sobrescrevem com regra do tipo).
   int calcularAtaqueBase() => _nivel * 2;
 
+  /// Q1 — Imprime todos os dados; Q6 nas subclasses inclui linha de categoria antes.
   void exibirFicha() {
     print('--- Ficha Pokemon ---');
     print('Numero: $numero');
@@ -188,6 +227,7 @@ class Pokemon implements RegistravelNaPokedex {
   }
 }
 
+/// Q6 — Subclasse Fogo: ataque = nivel * 3; ficha mostra categoria.
 class PokemonFogo extends Pokemon {
   PokemonFogo({
     required super.numero,
@@ -204,9 +244,11 @@ class PokemonFogo extends Pokemon {
     super.favorito,
   });
 
+  /// Q6 — Regra Fogo: nivel * 3.
   @override
   int calcularAtaqueBase() => nivel * 3;
 
+  /// Q6 — Acrescenta categoria antes da ficha completa da superclasse.
   @override
   void exibirFicha() {
     print('Categoria: Pokemon de Fogo');
@@ -214,6 +256,7 @@ class PokemonFogo extends Pokemon {
   }
 }
 
+/// Q6 — Subclasse Água: ataque = nivel * 2 + 10.
 class PokemonAgua extends Pokemon {
   PokemonAgua({
     required super.numero,
@@ -230,16 +273,19 @@ class PokemonAgua extends Pokemon {
     super.favorito,
   });
 
+  /// Q6 — Regra Água: nivel * 2 + 10.
   @override
   int calcularAtaqueBase() => nivel * 2 + 10;
 
   @override
   void exibirFicha() {
+    // Q6 — Mesmo padrão: categoria + ficha da superclasse.
     print('Categoria: Pokemon de Agua');
     super.exibirFicha();
   }
 }
 
+/// Q6 — Subclasse Elétrico: ataque = nivel * 2 + 15.
 class PokemonEletrico extends Pokemon {
   PokemonEletrico({
     required super.numero,
@@ -256,9 +302,11 @@ class PokemonEletrico extends Pokemon {
     super.favorito,
   });
 
+  /// Q6 — Regra Elétrico: nivel * 2 + 15.
   @override
   int calcularAtaqueBase() => nivel * 2 + 15;
 
+  /// Q6 — Categoria + ficha da superclasse.
   @override
   void exibirFicha() {
     print('Categoria: Pokemon Eletrico');
@@ -266,20 +314,24 @@ class PokemonEletrico extends Pokemon {
   }
 }
 
+/// Q7 — Modelo de habilidade: nome, custo de energia e efeito em [usar].
 abstract class Habilidade {
   final String nome;
   final int custoEnergia;
 
   Habilidade(this.nome, this.custoEnergia);
 
+  /// Aplica o efeito no [alvo] usando o ataque base do [usuario] e desconta energia.
   void usar(Pokemon usuario, Pokemon alvo);
 }
 
+/// Q7 — Dano = ataque base + 5; custo de energia no super.
 class ChoqueDoTrovao extends Habilidade {
   ChoqueDoTrovao() : super('Choque do Trovao', 15);
 
   @override
   void usar(Pokemon usuario, Pokemon alvo) {
+    // Gasta energia; se faltar, não aplica dano.
     if (!usuario.gastarEnergia(custoEnergia)) {
       return;
     }
@@ -288,6 +340,7 @@ class ChoqueDoTrovao extends Habilidade {
   }
 }
 
+/// Q7 — Dano = ataque base + 3.
 class JatoDAgua extends Habilidade {
   JatoDAgua() : super('Jato dAgua', 12);
 
@@ -301,6 +354,7 @@ class JatoDAgua extends Habilidade {
   }
 }
 
+/// Q7 — Dano = ataque base + 7.
 class LancaChamas extends Habilidade {
   LancaChamas() : super('Lanca-Chamas', 18);
 
@@ -314,9 +368,11 @@ class LancaChamas extends Habilidade {
   }
 }
 
+/// Q4, Q5, Q11 — Coleção de Pokémon com CRUD básico, filtros e estatísticas.
 class Pokedex {
   final List<Pokemon> _pokemons = [];
 
+  /// Q4 — Insere se o número ainda não existir; senão retorna false e avisa.
   bool adicionarPokemon(Pokemon p) {
     if (_pokemons.any((pokemon) => pokemon.numero == p.numero)) {
       print('Nao foi possivel adicionar: ja existe pokemon com numero ${p.numero}.');
@@ -326,6 +382,7 @@ class Pokedex {
     return true;
   }
 
+  /// Q4 — Remove pelo número; retorna true se removeu, false se não achou.
   bool removerPokemonPorNumero(int numero) {
     final indice = _pokemons.indexWhere((pokemon) => pokemon.numero == numero);
     if (indice == -1) {
@@ -335,6 +392,7 @@ class Pokedex {
     return true;
   }
 
+  /// Q4 — Retorna o Pokémon ou null.
   Pokemon? buscarPorNumero(int numero) {
     for (final pokemon in _pokemons) {
       if (pokemon.numero == numero) {
@@ -344,6 +402,7 @@ class Pokedex {
     return null;
   }
 
+  /// Q4 — Imprime a ficha de cada um (ou mensagem se vazia).
   void listarTodos() {
     if (_pokemons.isEmpty) {
       print('Pokedex vazia.');
@@ -354,20 +413,24 @@ class Pokedex {
     }
   }
 
+  /// Q5 — Apenas com capturado == true.
   List<Pokemon> listarCapturados() {
     return _pokemons.where((pokemon) => pokemon.capturado).toList();
   }
 
+  /// Q5 — Filtra por tipo ignorando maiúsculas/minúsculas.
   List<Pokemon> listarPorTipo(String tipo) {
     return _pokemons
         .where((pokemon) => pokemon.tipo.toLowerCase() == tipo.toLowerCase())
         .toList();
   }
 
+  /// Q5 — nivel estritamente maior que [nivelMinimo].
   List<Pokemon> listarAcimaDoNivel(int nivelMinimo) {
     return _pokemons.where((pokemon) => pokemon.nivel > nivelMinimo).toList();
   }
 
+  /// Q5 — Tem próxima evolução e nivel >= nivelEvolucao.
   List<Pokemon> listarQuePodemEvoluir() {
     return _pokemons
         .where((pokemon) =>
@@ -375,8 +438,10 @@ class Pokedex {
         .toList();
   }
 
+  /// Q11 — Quantidade cadastrada (0 se vazia).
   int totalPokemons() => _pokemons.length;
 
+  /// Q11 — Conta por string de tipo exata como está em cada Pokémon.
   Map<String, int> quantidadePorTipo() {
     final Map<String, int> quantidade = {};
     for (final pokemon in _pokemons) {
@@ -385,6 +450,7 @@ class Pokedex {
     return quantidade;
   }
 
+  /// Q11 — Média aritmética dos níveis; 0 se lista vazia.
   double mediaDeNivel() {
     if (_pokemons.isEmpty) {
       return 0;
@@ -393,6 +459,7 @@ class Pokedex {
     return soma / _pokemons.length;
   }
 
+  /// Q11 — (capturados / total) * 100; 0 se vazia.
   double percentualCapturados() {
     if (_pokemons.isEmpty) {
       return 0;
@@ -401,9 +468,11 @@ class Pokedex {
     return (capturados / _pokemons.length) * 100;
   }
 
+  /// Q10 — Cópia somente leitura da lista interna (para consultas com lambdas no main).
   List<Pokemon> todos() => List.unmodifiable(_pokemons);
 }
 
+/// Q8 — Polimorfismo: delega para [habilidade.usar] (sem if/switch por tipo de habilidade).
 void executarTurnoBatalha(Pokemon atacante, Pokemon defensor, Habilidade habilidade) {
   habilidade.usar(atacante, defensor);
   print(
@@ -414,6 +483,7 @@ void executarTurnoBatalha(Pokemon atacante, Pokemon defensor, Habilidade habilid
   }
 }
 
+/// Auxiliar — Imprime título e resumo de cada Pokémon (usado nos filtros e na Q10).
 void exibirLista(String titulo, List<Pokemon> pokemons) {
   print('\n$titulo');
   if (pokemons.isEmpty) {
@@ -426,6 +496,7 @@ void exibirLista(String titulo, List<Pokemon> pokemons) {
 }
 
 void main() {
+  // --- Q1: três instâncias e exibirFicha() em cada uma ---
   print('=== Questao 1: Cadastro basico ===');
   final bulbasaur = Pokemon(
     numero: 1,
@@ -468,6 +539,7 @@ void main() {
   charmanderBase.exibirFicha();
   squirtleBase.exibirFicha();
 
+  // --- Q2: subirNivel, receberDano, curar em pelo menos 2 pokémons (inclui valor inválido) ---
   print('\n=== Questao 2: Encapsulamento e validacoes ===');
   bulbasaur.subirNivel(3);
   bulbasaur.receberDano(12);
@@ -484,11 +556,13 @@ void main() {
     '${squirtleBase.nome} -> nivel: ${squirtleBase.nivel}, hp: ${squirtleBase.hpAtual}/${squirtleBase.hpMaximo}',
   );
 
+  // --- Q3: chama evoluir() quando nível e próxima evolução permitem ---
   print('\n=== Questao 3: Evolucao ===');
   bulbasaur.subirNivel(10);
   bulbasaur.evoluir();
   squirtleBase.evoluir();
 
+  // --- Q4+: Pokédex, cadastro 5+, teste duplicata, busca, remoção, listarTodos ---
   print('\n=== Questao 4 em diante: Pokedex completa ===');
   final pokedex = Pokedex();
 
@@ -616,17 +690,20 @@ void main() {
   print('\nListagem completa:');
   pokedex.listarTodos();
 
+  // --- Q5: cada filtro exibido separadamente ---
   print('\n=== Questao 5: Filtros ===');
   exibirLista('Capturados', pokedex.listarCapturados());
   exibirLista('Tipo FOGO (case insensitive)', pokedex.listarPorTipo('fOgO'));
   exibirLista('Acima do nivel 15', pokedex.listarAcimaDoNivel(15));
   exibirLista('Que podem evoluir agora', pokedex.listarQuePodemEvoluir());
 
+  // --- Q6: uma ficha de cada subclasse (Fogo, Água, Elétrico) ---
   print('\n=== Questao 6: Heranca e sobrescrita ===');
   pikachu.exibirFicha();
   charmander.exibirFicha();
   squirtle.exibirFicha();
 
+  // --- Q9: visto, capturado, favoritar só após capturar ---
   print('\n=== Questao 9: Interface de registro ===');
   oddish.marcarComoVisto();
   oddish.favoritar(); // nao deve permitir
@@ -640,6 +717,7 @@ void main() {
   eevee.favoritar();
   vulpix.favoritar();
 
+  // --- Q7: habilidades com custo de energia | Q8: 3+ turnos + 2 batalhas via executarTurnoBatalha ---
   print('\n=== Questao 7 e 8: Habilidades e batalha polimorfica ===');
   final choque = ChoqueDoTrovao();
   final jato = JatoDAgua();
@@ -656,6 +734,7 @@ void main() {
   executarTurnoBatalha(charmander, psyduck, lanca);
   executarTurnoBatalha(psyduck, charmander, jato);
 
+  // --- Q10: where/sort com lambdas direto (sem métodos nomeados só para comparar/filtrar) ---
   print('\n=== Questao 10: Funcoes anonimas ===');
   final hpBaixo = pokedex.todos().where((p) => p.hpAtual < 30).toList();
   exibirLista('HP atual abaixo de 30', hpBaixo);
@@ -670,12 +749,14 @@ void main() {
   final favoritos = pokedex.todos().where((p) => p.favorito).toList();
   exibirLista('Somente favoritos', favoritos);
 
+  // --- Q11: totais, mapa por tipo, média, % capturados ---
   print('\n=== Questao 11: Estatisticas ===');
   print('Total de pokemons: ${pokedex.totalPokemons()}');
   print('Quantidade por tipo: ${pokedex.quantidadePorTipo()}');
   print('Media de nivel: ${pokedex.mediaDeNivel().toStringAsFixed(2)}');
   print('Percentual capturados: ${pokedex.percentualCapturados().toStringAsFixed(2)}%');
 
+  // --- Q12: evoluções extras + encerramento (o fluxo acima já cumpre 8+ pokémons, 3 tipos, etc.) ---
   print('\n=== Questao 12: Desafio final ===');
   // Evolucao adicional para garantir demonstracao no app completo.
   charmander.evoluir();
