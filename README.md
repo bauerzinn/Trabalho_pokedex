@@ -4,17 +4,13 @@
 **Professor:** Chauã Queirolo
 
 ## Identificação da equipe
+|          Nome          |
+|------------------------|
+|Gabriel Bauer           |
+|Iuker de Sousa Santos   |
+|Murilo H. Baruffi       |
+|Rafael de Lima Grabowski|
 
-Preencha com os dados do seu grupo:
-
-| Nome | RA / matrícula |
-|------|----------------|
-|      |                |
-|      |                |
-|      |                |
-|      |                |
-
-*(Trabalho em equipes de 2 a 4 alunos.)*
 
 ## Como executar
 
@@ -23,14 +19,6 @@ No diretório do projeto:
 ```bash
 dart run main.dart
 ```
-
-Se usar Flutter com Dart embutido:
-
-```bash
-flutter dart run main.dart
-```
-
----
 
 ## Enunciado — Questões
 
