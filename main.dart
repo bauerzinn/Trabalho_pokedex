@@ -1,20 +1,17 @@
 // =============================================================================
-// PROVA PRÁTICA — POKÉDEX (Dart): mapa das questões neste arquivo
-// Q1  Pokemon + construtor + exibirFicha
-// Q2  Campos privados (_nivel, _hp*, _energia) + subirNivel / receberDano / curar
-// Q3  proximaEvolucao, nivelEvolucao, evoluir()
-// Q4  Pokedex: adicionar, remover, buscar, listarTodos
-// Q5  Filtros na Pokedex (listarCapturados, por tipo, nível, podem evoluir)
-// Q6  PokemonFogo / PokemonAgua / PokemonEletrico + calcularAtaqueBase / exibirFicha
-// Q7  Habilidade abstrata + 3 habilidades + gastarEnergia nas habilidades
-// Q8  executarTurnoBatalha — chama habilidade.usar() sem if/switch por tipo de habilidade
-// Q9  RegistravelNaPokedex em Pokemon (visto, capturado, favorito)
-// Q10 main: where/sort com funções anônimas
-// Q11 totalPokemons, quantidadePorTipo, mediaDeNivel, percentualCapturados
-// Q12 main: fluxo completo (8+ pokémons, batalhas, evolução, estatísticas)
+// CONCEITOS DA PROVA (POO em Dart) — onde aparecem neste arquivo:
+// • Classe e objetos     → class Pokemon (+ subclasses); instâncias no main()
+// • Encapsulamento       → campos _privados, getters, métodos que validam estado
+// • Herança / sobrescrita → extends Pokemon + @override em calcularAtaqueBase e exibirFicha
+// • Classe abstrata      → abstract class Habilidade (+ método usar sem corpo)
+// • Interface            → abstract class RegistravelNaPokedex; Pokemon implements ...
+// • Polimorfismo         → habilidade.usar(...) e usuario.calcularAtaqueBase() em runtime
+// • Coleções             → List<Pokemon> na Pokedex, Map em quantidadePorTipo, where/fold
+// • Funções anônimas     → main(): where((p) => ...) e sort((a, b) => ...) inline
 // =============================================================================
 
 /// Q9 — Interface: o que a Pokédex precisa registrar sobre um Pokémon.
+// CONCEITO: Interface — contrato (visto / capturado / favorito); Dart: abstract class + implements.
 abstract class RegistravelNaPokedex {
   /// Marca o Pokémon como já visto na Pokédex.
   void marcarComoVisto();
@@ -30,10 +27,13 @@ abstract class RegistravelNaPokedex {
 }
 
 /// Q1 — Classe principal do Pokémon. Q2 encapsula status; Q3 evolução; Q7 energia; Q9 interface.
+// CONCEITO: Classe e objetos — molde Pokemon; cada variável Pokemon(...) no main é um objeto.
+// CONCEITO: Interface — esta classe cumpre o contrato RegistravelNaPokedex (métodos @override abaixo).
 class Pokemon implements RegistravelNaPokedex {
   final int numero;
   String nome;
   final String tipo;
+  // CONCEITO: Encapsulamento — estado sensível só é alterado por métodos (subirNivel, receberDano, curar, etc.).
   int _nivel;
   int _hpAtual;
   int _hpMaximo;
@@ -66,6 +66,7 @@ class Pokemon implements RegistravelNaPokedex {
     _validarEstadoInicial();
   }
 
+  // CONCEITO: Encapsulamento — leitura controlada dos campos privados (sem expor _nivel diretamente).
   int get nivel => _nivel;
   int get hpAtual => _hpAtual;
   int get hpMaximo => _hpMaximo;
@@ -206,6 +207,7 @@ class Pokemon implements RegistravelNaPokedex {
   }
 
   /// Q6 — Ataque base padrão da classe base (subclasses sobrescrevem com regra do tipo).
+  // CONCEITO: Polimorfismo — subclasses trocam esta fórmula; chamadas via tipo Pokemon usam a versão real do objeto.
   int calcularAtaqueBase() => _nivel * 2;
 
   /// Q1 — Imprime todos os dados; Q6 nas subclasses inclui linha de categoria antes.
@@ -228,6 +230,7 @@ class Pokemon implements RegistravelNaPokedex {
 }
 
 /// Q6 — Subclasse Fogo: ataque = nivel * 3; ficha mostra categoria.
+// CONCEITO: Herança (extends) e sobrescrita (@override) — reaproveita Pokemon e muda ataque/ficha.
 class PokemonFogo extends Pokemon {
   PokemonFogo({
     required super.numero,
@@ -257,6 +260,7 @@ class PokemonFogo extends Pokemon {
 }
 
 /// Q6 — Subclasse Água: ataque = nivel * 2 + 10.
+// CONCEITO: Herança e sobrescrita — mesma ideia que PokemonFogo, regra de água.
 class PokemonAgua extends Pokemon {
   PokemonAgua({
     required super.numero,
@@ -286,6 +290,7 @@ class PokemonAgua extends Pokemon {
 }
 
 /// Q6 — Subclasse Elétrico: ataque = nivel * 2 + 15.
+// CONCEITO: Herança e sobrescrita — mesma ideia, regra elétrica.
 class PokemonEletrico extends Pokemon {
   PokemonEletrico({
     required super.numero,
@@ -315,6 +320,7 @@ class PokemonEletrico extends Pokemon {
 }
 
 /// Q7 — Modelo de habilidade: nome, custo de energia e efeito em [usar].
+// CONCEITO: Classe abstrata — não instancia Habilidade direto; só subclasses concretas implementam usar().
 abstract class Habilidade {
   final String nome;
   final int custoEnergia;
@@ -326,6 +332,7 @@ abstract class Habilidade {
 }
 
 /// Q7 — Dano = ataque base + 5; custo de energia no super.
+// CONCEITO: Herança — habilidade concreta estende a abstrata e implementa usar().
 class ChoqueDoTrovao extends Habilidade {
   ChoqueDoTrovao() : super('Choque do Trovao', 15);
 
@@ -369,7 +376,9 @@ class LancaChamas extends Habilidade {
 }
 
 /// Q4, Q5, Q11 — Coleção de Pokémon com CRUD básico, filtros e estatísticas.
+// CONCEITO: Coleções — List guarda os cadastrados; filtros usam .where; estatísticas usam Map e fold.
 class Pokedex {
+  // CONCEITO: Coleções — lista interna da Pokédex (encapsulada: acesso via métodos e todos()).
   final List<Pokemon> _pokemons = [];
 
   /// Q4 — Insere se o número ainda não existir; senão retorna false e avisa.
@@ -414,6 +423,7 @@ class Pokedex {
   }
 
   /// Q5 — Apenas com capturado == true.
+  // CONCEITO: Coleções + função anônima (callback em where) — critério inline.
   List<Pokemon> listarCapturados() {
     return _pokemons.where((pokemon) => pokemon.capturado).toList();
   }
@@ -442,6 +452,7 @@ class Pokedex {
   int totalPokemons() => _pokemons.length;
 
   /// Q11 — Conta por string de tipo exata como está em cada Pokémon.
+  // CONCEITO: Coleções — Map agrupa contagens por chave (tipo).
   Map<String, int> quantidadePorTipo() {
     final Map<String, int> quantidade = {};
     for (final pokemon in _pokemons) {
@@ -455,6 +466,7 @@ class Pokedex {
     if (_pokemons.isEmpty) {
       return 0;
     }
+    // CONCEITO: Coleções — fold com função anônima acumula soma dos níveis.
     final soma = _pokemons.fold<int>(0, (acc, pokemon) => acc + pokemon.nivel);
     return soma / _pokemons.length;
   }
@@ -473,7 +485,9 @@ class Pokedex {
 }
 
 /// Q8 — Polimorfismo: delega para [habilidade.usar] (sem if/switch por tipo de habilidade).
+// CONCEITO: Polimorfismo — o parâmetro é Habilidade; em runtime roda ChoqueDoTrovao, JatoDAgua, etc., sem switch.
 void executarTurnoBatalha(Pokemon atacante, Pokemon defensor, Habilidade habilidade) {
+  // CONCEITO: Polimorfismo — uma única chamada; dentro de usar(), calcularAtaqueBase() também é polimórfico.
   habilidade.usar(atacante, defensor);
   print(
     '${atacante.nome} usou ${habilidade.nome} em ${defensor.nome}. HP restante de ${defensor.nome}: ${defensor.hpAtual}/${defensor.hpMaximo}',
@@ -497,6 +511,7 @@ void exibirLista(String titulo, List<Pokemon> pokemons) {
 
 void main() {
   // --- Q1: três instâncias e exibirFicha() em cada uma ---
+  // CONCEITO: Classe e objetos — abaixo, `new` implícito: cada final ... = Pokemon(...) cria um objeto.
   print('=== Questao 1: Cadastro basico ===');
   final bulbasaur = Pokemon(
     numero: 1,
@@ -735,6 +750,7 @@ void main() {
   executarTurnoBatalha(psyduck, charmander, jato);
 
   // --- Q10: where/sort com lambdas direto (sem métodos nomeados só para comparar/filtrar) ---
+  // CONCEITO: Funções anônimas — (p) => ... e (a, b) => ... passadas direto a where/sort (exigência da prova).
   print('\n=== Questao 10: Funcoes anonimas ===');
   final hpBaixo = pokedex.todos().where((p) => p.hpAtual < 30).toList();
   exibirLista('HP atual abaixo de 30', hpBaixo);
