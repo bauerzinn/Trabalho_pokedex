@@ -1,15 +1,3 @@
-// =============================================================================
-// CONCEITOS DA PROVA (POO em Dart) — onde aparecem neste arquivo:
-// • Classe e objetos     → class Pokemon (+ subclasses); instâncias no main()
-// • Encapsulamento       → campos _privados, getters, métodos que validam estado
-// • Herança / sobrescrita → extends Pokemon + @override em calcularAtaqueBase e exibirFicha
-// • Classe abstrata      → abstract class Habilidade (+ método usar sem corpo)
-// • Interface            → abstract class RegistravelNaPokedex; Pokemon implements ...
-// • Polimorfismo         → habilidade.usar(...) e usuario.calcularAtaqueBase() em runtime
-// • Coleções             → List<Pokemon> na Pokedex, Map em quantidadePorTipo, where/fold
-// • Funções anônimas     → main(): where((p) => ...) e sort((a, b) => ...) inline
-// =============================================================================
-
 /// Q9 — Interface: o que a Pokédex precisa registrar sobre um Pokémon.
 // CONCEITO: Interface — contrato (visto / capturado / favorito); Dart: abstract class + implements.
 abstract class RegistravelNaPokedex {
